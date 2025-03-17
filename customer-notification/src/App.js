@@ -26,7 +26,7 @@ const App = () => {
     return new Promise((resolve, reject) => {
       const apiUrl = notificationData.notificationMethod === 'sms' ? '/send-sms' : '/send-email';
       
-      fetch('http://localhost:5000' + apiUrl, {
+      fetch('https://notificationbackend1234.vercel.app/' + apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

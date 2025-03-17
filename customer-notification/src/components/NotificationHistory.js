@@ -10,7 +10,7 @@ const NotificationHistory = () => {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/notifications'); // Backend API
+        const response = await axios.get('https://notificationbackend1234.vercel.app/api/notifications'); // Backend API
         // Ensure history is defined before attempting to use length
         setHistory(response.data.history || []);  // Default to an empty array if history is undefined
         setLoading(false);
