@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
-import { MenuItem, Select, FormControl, InputLabel, TextField, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import {
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  TextField,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Paper,
+} from '@mui/material';
 
 const TemplateSelection = ({ selectedTemplate, onTemplateChange }) => {
   // Define messages for each template
@@ -15,11 +27,14 @@ const TemplateSelection = ({ selectedTemplate, onTemplateChange }) => {
   const [newTemplateName, setNewTemplateName] = useState('');
   const [newTemplateMessage, setNewTemplateMessage] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState(''); // Store selected template message
 
   // Handle template change
   const handleTemplateChange = (e) => {
     const selected = e.target.value;
-    onTemplateChange(selected, templates[selected]); // Pass the template name and its message
+    const message = templates[selected] || '';
+    setSelectedMessage(message); // Update local state with selected message
+    onTemplateChange(selected, message); // Pass selection to parent component
   };
 
   // Handle new template input change
@@ -55,13 +70,25 @@ const TemplateSelection = ({ selectedTemplate, onTemplateChange }) => {
   };
 
   return (
-    <div className="mb-4">
-      <FormControl fullWidth>
+    <Paper
+      elevation={6} // Card shadow effect
+      sx={{
+        p: 3,
+        borderRadius: 2,
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)', // Light gradient background
+      }}
+    >
+      <FormControl fullWidth sx={{ mb: 2 }}>
         <InputLabel>Template</InputLabel>
         <Select
-          value={selectedTemplate}
+          value={selectedTemplate || ''}
           onChange={handleTemplateChange}
           label="Template"
+          sx={{
+            backgroundColor: 'white',
+            borderRadius: 1,
+            boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.1)', // Slight shadow for a floating effect
+          }}
         >
           {Object.keys(templates).map((templateKey) => (
             <MenuItem key={templateKey} value={templateKey}>
@@ -69,30 +96,34 @@ const TemplateSelection = ({ selectedTemplate, onTemplateChange }) => {
             </MenuItem>
           ))}
           {/* Add Template Option */}
-          <MenuItem onClick={handleOpenDialog}>
+          <MenuItem onClick={handleOpenDialog} sx={{ fontWeight: 'bold', color: '#1976D2' }}>
             Add Template
           </MenuItem>
         </Select>
       </FormControl>
 
       {/* Display the message of the selected template */}
-      <div className="mt-4">
-        <TextField
-          label="Template Message"
-          variant="outlined"
-          multiline
-          rows={4}
-          fullWidth
-          value={templates[selectedTemplate] || ''}
-          onChange={() => {}}
-          disabled
-        />
-      </div>
+      <TextField
+        label="Template Message"
+        variant="outlined"
+        multiline
+        rows={4}
+        fullWidth
+        value={selectedMessage} // Display selected message
+        disabled
+        sx={{
+          backgroundColor: 'white',
+          borderRadius: 1,
+          boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.1)',
+        }}
+      />
 
       {/* Dialog for Adding a New Template */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Add New Template</DialogTitle>
-        <DialogContent>
+        <DialogTitle sx={{ background: 'linear-gradient(135deg, #2193b0, #6dd5ed)', color: 'white' }}>
+          Add New Template
+        </DialogTitle>
+        <DialogContent sx={{ backgroundColor: '#f4f6f8' }}>
           <TextField
             label="Template Name"
             variant="outlined"
@@ -111,16 +142,23 @@ const TemplateSelection = ({ selectedTemplate, onTemplateChange }) => {
             onChange={handleNewTemplateMessageChange}
           />
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ backgroundColor: '#f4f6f8' }}>
           <Button onClick={handleCloseDialog} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleAddTemplate} color="primary">
+          <Button
+            onClick={handleAddTemplate}
+            sx={{
+              background: 'linear-gradient(135deg, #56ab2f, #a8e063)',
+              color: 'white',
+              '&:hover': { background: 'linear-gradient(135deg, #4ca62f, #94d65e)' },
+            }}
+          >
             Add Template
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Paper>
   );
 };
 

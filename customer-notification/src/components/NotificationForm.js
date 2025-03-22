@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button, TextField, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
-import TemplateSelection from './TemplateSelection';  // Import TemplateSelection component
+import { Button, TextField, MenuItem, Select, FormControl, InputLabel, Paper, Typography, Box } from '@mui/material';
+import TemplateSelection from './TemplateSelection';
 
 const NotificationForm = ({ onSendNotification, setResponseMessage, setOpenSnackbar }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -11,19 +11,18 @@ const NotificationForm = ({ onSendNotification, setResponseMessage, setOpenSnack
   const [notificationMethod, setNotificationMethod] = useState('sms');
   const [template, setTemplate] = useState('');
 
-  // Handle template change (received from TemplateSelection)
+  // Handle template change from TemplateSelection
   const handleTemplateChange = (selectedTemplate, selectedTemplateMessage) => {
     setTemplate(selectedTemplate);
 
-    // If the notification method is SMS, set the message
     if (notificationMethod === 'sms') {
-      setMessage(selectedTemplateMessage || ''); // Set the corresponding template message for SMS
-      setEmailSubject(''); // Clear the email subject for SMS
-      setEmailMessage(''); // Clear the email message for SMS
+      setMessage(selectedTemplateMessage || '');
+      setEmailSubject('');
+      setEmailMessage('');
     } else if (notificationMethod === 'email') {
-      setEmailMessage(selectedTemplateMessage || ''); // Set the corresponding template message for Email
-      setEmailSubject(`${selectedTemplate.charAt(0).toUpperCase() + selectedTemplate.slice(1)} Subject`); // Set email subject dynamically
-      setMessage(''); // Clear the SMS message for email
+      setEmailMessage(selectedTemplateMessage || '');
+      setEmailSubject(`${selectedTemplate.charAt(0).toUpperCase() + selectedTemplate.slice(1)} Subject`);
+      setMessage('');
     }
   };
 
@@ -41,25 +40,18 @@ const NotificationForm = ({ onSendNotification, setResponseMessage, setOpenSnack
       template,
     };
 
-    // Validate the fields before sending the data
-    if (notificationMethod === 'email') {
-      if (!emailTo || !emailSubject || !emailMessage) {
-        setResponseMessage('Email To, Subject, and Message are required.');
-        setOpenSnackbar(true);
-        return;
-      }
-    } else if (notificationMethod === 'sms') {
-      if (!phoneNumber || !message) {
-        setResponseMessage('Phone Number and Message are required.');
-        setOpenSnackbar(true);
-        return;
-      }
+    if (notificationMethod === 'email' && (!emailTo || !emailSubject || !emailMessage)) {
+      setResponseMessage('Email To, Subject, and Message are required.');
+      setOpenSnackbar(true);
+      return;
+    } else if (notificationMethod === 'sms' && (!phoneNumber || !message)) {
+      setResponseMessage('Phone Number and Message are required.');
+      setOpenSnackbar(true);
+      return;
     }
 
-    // Log the notification data before sending it to the server
     console.log('Sending notification data:', notificationData);
 
-    // Send notification
     onSendNotification(notificationData)
       .then((response) => {
         setResponseMessage(response.message || 'Notification sent successfully');
@@ -72,101 +64,176 @@ const NotificationForm = ({ onSendNotification, setResponseMessage, setOpenSnack
   };
 
   return (
-    <div className="p-4 max-w-lg mx-auto">
-      <form onSubmit={handleSubmit}>
-        {/* Notification Method Dropdown */}
-        <div className="mb-4">
-          <FormControl fullWidth>
-            <InputLabel>Notification Method</InputLabel>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #e0f0ff, #f5fbff)', // Light Blue Gradient Background 🎨
+        padding: 3,
+      }}
+    >
+      <Paper
+        elevation={10}
+        sx={{
+          maxWidth: 500,
+          width: '100%',
+          padding: 4,
+          borderRadius: 3,
+          background: 'linear-gradient(135deg, #ffffff, #f2f8ff)', // Soft Inner Gradient 🌟
+          boxShadow: '0px 10px 30px rgba(0,0,0,0.15)',
+          transition: 'transform 0.3s ease-in-out',
+          '&:hover': {
+            transform: 'scale(1.02)',
+          },
+        }}
+      >
+        <Typography
+          variant="h5"
+          align="center"
+          gutterBottom
+          fontWeight="bold"
+          sx={{
+            background: 'linear-gradient(90deg, #0072ff, #00c6ff)', // Title Gradient
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}
+        >
+          📢 Send a Notification
+        </Typography>
+
+        <form onSubmit={handleSubmit}>
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel sx={{ fontWeight: 'bold' }}>Notification Method</InputLabel>
             <Select
               value={notificationMethod}
               onChange={(e) => {
                 setNotificationMethod(e.target.value);
-                if (e.target.value === 'sms') {
-                  setEmailSubject('');
-                  setEmailMessage('');
-                  setMessage('');
-                  setEmailTo('');
-                }
+                setEmailSubject('');
+                setEmailMessage('');
+                setMessage('');
+                setEmailTo('');
               }}
               label="Notification Method"
+              sx={{
+                background: 'linear-gradient(135deg, #e3f2fd, #ffffff)',
+                borderRadius: 1,
+                fontWeight: 'bold',
+              }}
             >
-              <MenuItem value="sms">SMS</MenuItem>
-              <MenuItem value="email">Email</MenuItem>
+              <MenuItem value="sms">📱 SMS</MenuItem>
+              <MenuItem value="email">📧 Email</MenuItem>
             </Select>
           </FormControl>
-        </div>
 
-        {/* Conditional rendering for Phone Number / Email Address */}
-        <div className="mb-4">
-          {notificationMethod === 'sms' && (
+          {/* Conditional Fields for SMS & Email */}
+          {notificationMethod === 'sms' ? (
             <TextField
-              label="Phone Number"
+              label="📞 Phone Number"
               variant="outlined"
               fullWidth
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
+              sx={{
+                mb: 2,
+                background: 'linear-gradient(135deg, #eef7ff, #ffffff)',
+                borderRadius: 1,
+                fontWeight: 'bold',
+              }}
             />
-          )}
-
-          {notificationMethod === 'email' && (
+          ) : (
             <TextField
-              label="Email Address"
+              label="📩 Email Address"
               variant="outlined"
               fullWidth
-              value={emailTo} // Use emailTo for email address
+              value={emailTo}
               onChange={(e) => setEmailTo(e.target.value)}
+              sx={{
+                mb: 2,
+                background: 'linear-gradient(135deg, #eef7ff, #ffffff)',
+                borderRadius: 1,
+                fontWeight: 'bold',
+              }}
             />
           )}
-        </div>
 
-        {/* Conditional rendering for Message (SMS) or Email Subject & Email Message (Email) */}
-        <div className="mb-4">
-          {notificationMethod === 'sms' && (
+          {notificationMethod === 'sms' ? (
             <TextField
-              label="Message"
+              label="✉️ Message"
               variant="outlined"
               fullWidth
               multiline
-              rows={4}
+              rows={3}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
+              sx={{
+                mb: 2,
+                background: 'linear-gradient(135deg, #eef7ff, #ffffff)',
+                borderRadius: 1,
+                fontWeight: 'bold',
+              }}
             />
-          )}
-
-          {notificationMethod === 'email' && (
+          ) : (
             <>
               <TextField
-                label="Email Subject"
+                label="📝 Email Subject"
                 variant="outlined"
                 fullWidth
                 value={emailSubject}
                 onChange={(e) => setEmailSubject(e.target.value)}
+                sx={{
+                  mb: 2,
+                  background: 'linear-gradient(135deg, #eef7ff, #ffffff)',
+                  borderRadius: 1,
+                  fontWeight: 'bold',
+                }}
               />
               <TextField
-                label="Email Message"
+                label="📨 Email Message"
                 variant="outlined"
                 fullWidth
                 multiline
-                rows={4}
+                rows={3}
                 value={emailMessage}
                 onChange={(e) => setEmailMessage(e.target.value)}
+                sx={{
+                  mb: 2,
+                  background: 'linear-gradient(135deg, #eef7ff, #ffffff)',
+                  borderRadius: 1,
+                  fontWeight: 'bold',
+                }}
               />
             </>
           )}
-        </div>
 
-        {/* Template Selection Component */}
-        <TemplateSelection selectedTemplate={template} onTemplateChange={handleTemplateChange} />
+          {/* Template Selection */}
+          <TemplateSelection selectedTemplate={template} onTemplateChange={handleTemplateChange} />
 
-        {/* Submit Button */}
-        <div className="mb-4">
-          <Button type="submit" variant="contained" color="primary" fullWidth>
-            Send Notification
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{
+              mt: 2,
+              background: 'linear-gradient(135deg, #0072ff, #00c6ff)', // Medium Blue Gradient Button
+              color: 'white',
+              fontWeight: 'bold',
+              fontSize: '1rem',
+              borderRadius: 2,
+              padding: '12px',
+              textTransform: 'none',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #005bbf, #0096ff)',
+              },
+            }}
+          >
+            🚀 Send Notification
           </Button>
-        </div>
-      </form>
-    </div>
+        </form>
+      </Paper>
+    </Box>
   );
 };
 
